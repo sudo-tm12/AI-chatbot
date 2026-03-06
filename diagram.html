@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BC CourseFinder – System Architecture</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #f8f9fa;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px 32px 56px;
+    }
+
+    .canvas {
+      width: 900px;
+      background: #ffffff;
+      border: 1px solid #dde1e7;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 40px 44px 48px;
+    }
+
+    /* ── Title ── */
+    .diagram-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e8eaed;
+    }
+
+    .diagram-title h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .diagram-title p {
+      font-size: 11.5px;
+      color: #6b7280;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .title-meta {
+      text-align: right;
+      font-size: 10.5px;
+      color: #9ca3af;
+      line-height: 1.8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Swimlane ── */
+    .swimlane {
+      display: flex;
+      border: 1.5px solid;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    .swimlane-label {
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+      padding: 16px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      flex-shrink: 0;
+    }
+
+    .swimlane-body {
+      flex: 1;
+      padding: 18px 20px;
+      background: #fff;
+    }
+
+    /* Swimlane colours */
+    .lane-client  { border-color: #2563eb; }
+    .lane-client  .swimlane-label { background: #2563eb; color: #fff; }
+
+    .lane-server  { border-color: #16a34a; }
+    .lane-server  .swimlane-label { background: #16a34a; color: #fff; }
+
+    .lane-gemini  { border-color: #7c3aed; }
+    .lane-gemini  .swimlane-label { background: #7c3aed; color: #fff; }
+
+    /* ── Connector between lanes ── */
+    .connector {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 0;
+      height: 44px;
+      position: relative;
+    }
+
+    .conn-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: #cbd5e1;
+      transform: translateX(-50%);
+    }
+
+    .conn-badge {
+      position: relative;
+      z-index: 1;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 5px 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .http-method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .method-post { background: #dcfce7; color: #15803d; }
+    .method-https { background: #ede9fe; color: #6d28d9; }
+
+    .conn-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #6b7280;
+    }
+
+    .conn-arrow {
+      position: absolute;
+      left: 50%;
+      bottom: -1px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid #94a3b8;
+    }
+
+    /* ── Component cards (inside lanes) ── */
+    .cards {
+      display: flex;
+      gap: 12px;
+    }
+
+    .card {
+      flex: 1;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 14px 14px 12px;
+      background: #f8fafc;
+      position: relative;
+    }
+
+    .card-type {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .type-ui     { background: #dbeafe; color: #1d4ed8; }
+    .type-stack  { background: #fef9c3; color: #854d0e; }
+    .type-logic  { background: #dcfce7; color: #15803d; }
+    .type-model  { background: #ede9fe; color: #6d28d9; }
+    .type-secure { background: #fee2e2; color: #b91c1c; }
+    .type-output { background: #fce7f3; color: #9d174d; }
+
+    .card-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .card-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    /* ── Server steps ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 5px;
+      padding: 8px 13px;
+    }
+
+    .step-n {
+      width: 22px;
+      height: 22px;
+      background: #16a34a;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 11.5px;
+      color: #374151;
+      line-height: 1.4;
+    }
+
+    .inline-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      background: #e2e8f0;
+      color: #1e293b;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ── Data flow row ── */
+    .flow-section {
+      margin-top: 30px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .flow-header {
+      background: #f1f5f9;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding: 9px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-header::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px #dcfce7;
+    }
+
+    .flow-nodes {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+    }
+
+    .flow-node {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 10px;
+      gap: 8px;
+      border-right: 1px solid #f1f5f9;
+      position: relative;
+    }
+
+    .flow-node:last-child { border-right: none; }
+
+    .flow-node::after {
+      content: '→';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #94a3b8;
+      z-index: 2;
+    }
+
+    .flow-node:last-child::after { display: none; }
+
+    .flow-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: 1.5px solid;
+      flex-shrink: 0;
+    }
+
+    .icon-blue   { background: #eff6ff; border-color: #bfdbfe; }
+    .icon-green  { background: #f0fdf4; border-color: #bbf7d0; }
+    .icon-purple { background: #f5f3ff; border-color: #ddd6fe; }
+
+    .flow-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.4;
+      max-width: 80px;
+    }
+
+    /* ── Footer legend ── */
+    .legend {
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .legend-items {
+      display: flex;
+      gap: 18px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10.5px;
+      color: #6b7280;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legend-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+<div class="canvas">
+
+  <!-- Title -->
+  <div class="diagram-title">
+    <div>
+      <h1>BC CourseFinder™ — High-Level System Architecture</h1>
+      <p>// Belgium Campus iTversity &nbsp;·&nbsp; AI-Powered Career Guidance Platform</p>
+    </div>
+    <div class="title-meta">
+      <div>v1.0 &nbsp;·&nbsp; Production</div>
+      <div>Stack: Node.js + HTML/CSS/JS</div>
+      <div>AI: Google Gemini 2.0 Flash</div>
+    </div>
+  </div>
+
+  <!-- LAYER 1: CLIENT -->
+  <div class="swimlane lane-client">
+    <div class="swimlane-label">Client Layer</div>
+    <div class="swimlane-body">
+      <div class="cards">
+        <div class="card">
+          <span class="card-type type-ui">UI</span>
+          <span class="card-icon">🎓</span>
+          <div class="card-name">Welcome Hero Card</div>
+          <div class="card-desc">Introduction &amp; onboarding for Matric students</div>
+        </div>
+        <div class="card">
+          <span class="card-type type-ui">UI</span>
+          <span class="card-icon">⚡</span>
+          <div class="card-name">Suggestion Chips</div>
+          <div class="card-desc">Pre-built quick-start conversation prompts</div>
+        </div>
+        <div class="card">
+          <span class="card-type type-ui">UI</span>
+          <span class="card-icon">💬</span>
+          <div class="card-name">Chat Window</div>
+          <div class="card-desc">Animated bubbles, input pill &amp; send button</div>
+        </div>
+        <div class="card">
+          <span class="card-type type-stack">STACK</span>
+          <span class="card-icon">📄</span>
+          <div class="card-name">index.html</div>
+          <div class="card-desc">Single-file app — HTML + CSS + Vanilla JS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connector 1 -->
+  <div class="connector">
+    <div class="conn-line"></div>
+    <div class="conn-badge">
+      <span class="http-method method-post">POST</span>
+      <span class="conn-url">/api/chat &nbsp;·&nbsp; body: { message: "student input" }</span>
+    </div>
+    <div class="conn-arrow"></div>
+  </div>
+
+  <!-- LAYER 2: SERVER -->
+  <div class="swimlane lane-server">
+    <div class="swimlane-label">Server Layer</div>
+    <div class="swimlane-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">01</div>
+          <div class="step-text">Serves <span class="inline-code">index.html</span> to the student's browser on <span class="inline-code">GET /</span></div>
+        </div>
+        <div class="step">
+          <div class="step-n">02</div>
+          <div class="step-text">Receives the student's message via <span class="inline-code">POST /api/chat</span> and parses the JSON body</div>
+        </div>
+        <div class="step">
+          <div class="step-n">03</div>
+          <div class="step-text">Injects the BC CourseFinder™ system prompt — defines the Jarvis persona, language, scope, and ethical guardrails</div>
+        </div>
+        <div class="step">
+          <div class="step-n">04</div>
+          <div class="step-text">Forwards the request to the <span class="inline-code">Gemini API</span> — API key is stored server-side and never exposed to the browser</div>
+        </div>
+        <div class="step">
+          <div class="step-n">05</div>
+          <div class="step-text">Receives the AI response, wraps it in JSON, and returns it to the browser with <span class="inline-code">Content-Type: application/json</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connector 2 -->
+  <div class="connector">
+    <div class="conn-line"></div>
+    <div class="conn-badge">
+      <span class="http-method method-https">HTTPS POST</span>
+      <span class="conn-url">generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent</span>
+    </div>
+    <div class="conn-arrow"></div>
+  </div>
+
+  <!-- LAYER 3: AI -->
+  <div class="swimlane lane-gemini">
+    <div class="swimlane-label">AI Layer</div>
+    <div class="swimlane-body">
+      <div class="cards">
+        <div class="card">
+          <span class="card-type type-model">MODEL</span>
+          <span class="card-icon">🤖</span>
+          <div class="card-name">Gemini 2.0 Flash</div>
+          <div class="card-desc">Google's fast, capable large language model for conversational AI</div>
+        </div>
+        <div class="card">
+          <span class="card-type type-model">PROMPT</span>
+          <span class="card-icon">📋</span>
+          <div class="card-name">System Prompt</div>
+          <div class="card-desc">Shapes persona, tone, scope boundaries &amp; ethical guardrails</div>
+        </div>
+        <div class="card">
+          <span class="card-type type-output">OUTPUT</span>
+          <span class="card-icon">📝</span>
+          <div class="card-name">Response Generation</div>
+          <div class="card-desc">Returns short, conversational, student-friendly guidance</div>
+        </div>
+        <div class="card">
+          <span class="card-type type-secure">SECURE</span>
+          <span class="card-icon">🔒</span>
+          <div class="card-name">API Key Auth</div>
+          <div class="card-desc">Bearer token stored server-side — never exposed to client</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Flow -->
+  <div class="flow-section">
+    <div class="flow-header">Request / Response Data Flow</div>
+    <div class="flow-nodes">
+      <div class="flow-node">
+        <div class="flow-icon-box icon-blue">✏️</div>
+        <div class="flow-label">Student types message</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-box icon-blue">🌐</div>
+        <div class="flow-label">Browser sends POST /api/chat</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-box icon-green">⚙️</div>
+        <div class="flow-label">Node.js injects system prompt</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-box icon-purple">🤖</div>
+        <div class="flow-label">Gemini generates reply</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-box icon-green">📦</div>
+        <div class="flow-label">Node.js returns JSON</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-box icon-blue">💬</div>
+        <div class="flow-label">Chat bubble renders in UI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-items">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#2563eb;"></div>
+        Client Layer (Browser)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#16a34a;"></div>
+        Server Layer (Node.js)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#7c3aed;"></div>
+        AI Layer (Gemini API)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#e2e8f0; border:1px solid #cbd5e1;"></div>
+        Component
+      </div>
+    </div>
+    <div class="legend-meta">BC CourseFinder™ &nbsp;·&nbsp; Belgium Campus &nbsp;·&nbsp; 2025</div>
+  </div>
+
+</div>
+</body>
+</html>

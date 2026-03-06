@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BC CourseFinder™ — Belgium Campus</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    :root {
+      --bc-blue: #1b4f8a;
+      --bc-blue-light: #2563b0;
+      --bc-gold: #c9a84c;
+      --bc-gold-light: #e2c06b;
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --surface-2: #f9f9fb;
+      --border: rgba(0, 0, 0, 0.06);
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #aeaeb2;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+      --shadow-lg: 0 10px 24px -4px rgba(0,0,0,0.07), 0 4px 10px -2px rgba(0,0,0,0.04);
+      --shadow-xl: 0 20px 48px -8px rgba(0,0,0,0.1), 0 8px 20px -4px rgba(0,0,0,0.05);
+      --radius-sm: 10px;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --radius-xl: 28px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      width: 100%;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo-mark {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--bc-blue) 0%, var(--bc-blue-light) 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: #fff;
+      letter-spacing: -0.3px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .nav-brand-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+
+    .nav-brand-sub {
+      font-size: 10.5px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1px;
+    }
+
+    .nav-pill {
+      margin-left: auto;
+      background: linear-gradient(135deg, var(--bc-blue) 0%, var(--bc-blue-light) 100%);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 20px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    /* ── Page ── */
+    .page {
+      width: 100%;
+      max-width: 760px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 20px 24px;
+      gap: 16px;
+    }
+
+    /* ── Hero card ── */
+    .hero {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 22px 22px 22px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+    }
+
+    .hero-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--bc-blue) 0%, var(--bc-blue-light) 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(27, 79, 138, 0.3);
+    }
+
+    .hero-body h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      margin-bottom: 5px;
+    }
+
+    .hero-body p {
+      font-size: 13.5px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Chips ── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+
+    .chip:hover {
+      background: var(--bc-blue);
+      border-color: var(--bc-blue);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(27, 79, 138, 0.25);
+    }
+
+    .chip:active { transform: translateY(0); }
+
+    /* ── Chat container ── */
+    .chat-container {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    /* ── Messages ── */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 300px;
+      max-height: 400px;
+      scroll-behavior: smooth;
+    }
+
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Bubble animation */
+    @keyframes bubbleIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      animation: bubbleIn 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+    }
+
+    .message-row.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .avatar.bot {
+      background: linear-gradient(135deg, var(--bc-blue) 0%, var(--bc-blue-light) 100%);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(27,79,138,0.3);
+    }
+
+    .avatar.user {
+      background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 100%);
+      color: #fff;
+    }
+
+    .bubble {
+      max-width: 68%;
+      padding: 11px 15px;
+      line-height: 1.58;
+      font-size: 14px;
+      font-weight: 400;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .bubble.bot {
+      background: var(--surface-2);
+      color: var(--text-primary);
+      border-radius: 18px 18px 18px 4px;
+      border: 1px solid var(--border);
+    }
+
+    .bubble.user {
+      background: linear-gradient(135deg, var(--bc-blue) 0%, var(--bc-blue-light) 100%);
+      color: #fff;
+      border-radius: 18px 18px 4px 18px;
+      box-shadow: 0 4px 12px rgba(27, 79, 138, 0.25);
+    }
+
+    .bubble.error {
+      background: #fff5f5;
+      color: #c0392b;
+      border: 1px solid rgba(192, 57, 43, 0.15);
+      border-radius: 18px;
+    }
+
+    /* Typing indicator */
+    .typing-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      animation: bubbleIn 0.2s ease both;
+    }
+
+    .typing-bubble {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 18px 18px 18px 4px;
+      padding: 13px 16px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--text-tertiary);
+      border-radius: 50%;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── Input area ── */
+    .input-area {
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .input-pill {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 8px 8px 8px 18px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-pill:focus-within {
+      border-color: rgba(27, 79, 138, 0.4);
+      box-shadow: 0 0 0 3px rgba(27, 79, 138, 0.08);
+    }
+
+    .input-pill textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1.5;
+      max-height: 100px;
+      padding: 4px 0;
+    }
+
+    .input-pill textarea::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--bc-blue) 0%, var(--bc-blue-light) 100%);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 2px 8px rgba(27, 79, 138, 0.35);
+    }
+
+    .send-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 14px rgba(27, 79, 138, 0.45);
+    }
+
+    .send-btn:active { transform: scale(0.95); }
+
+    .send-btn:disabled {
+      background: linear-gradient(135deg, #c0c0c8 0%, #d0d0d8 100%);
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .send-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: #fff;
+      margin-left: 2px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 14px 20px;
+      font-size: 11.5px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+
+    .footer a {
+      color: var(--bc-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-logo-mark">BC</div>
+    <div class="nav-brand">
+      <span class="nav-brand-name">BC CourseFinder™</span>
+      <span class="nav-brand-sub">Belgium Campus iTversity</span>
+    </div>
+    <div class="nav-pill">AI Career Guide</div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-icon">&#127891;</div>
+      <div class="hero-body">
+        <h2>Welcome, Matric Student!</h2>
+        <p>Your AI-powered guide to IT studies at Belgium Campus. Ask me about career paths, APS requirements, qualifications, learnerships, or the difference between a Diploma and a Degree.</p>
+      </div>
+    </div>
+
+    <!-- Suggestion chips -->
+    <div class="chips">
+      <button class="chip" onclick="ask('What IT courses does Belgium Campus offer?')">Belgium Campus courses</button>
+      <button class="chip" onclick="ask('How do I calculate my APS score?')">Calculate my APS</button>
+      <button class="chip" onclick="ask('What is the difference between a Diploma and a Degree in IT?')">Diploma vs Degree</button>
+      <button class="chip" onclick="ask('What IT career paths are available in South Africa?')">IT career paths</button>
+      <button class="chip" onclick="ask('Are there IT learnerships or internships in South Africa?')">Learnerships &amp; internships</button>
+      <button class="chip" onclick="ask('What Matric subjects do I need to study Cybersecurity?')">Cybersecurity requirements</button>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-container">
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <div class="input-pill">
+          <textarea id="input" rows="1" placeholder="Ask me anything about IT at Belgium Campus…"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Send">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    BC CourseFinder™ is an AI assistant — always verify important decisions with official sources.
+    &nbsp;·&nbsp; <a href="https://www.belgiumcampus.ac.za" target="_blank">belgiumcampus.ac.za</a>
+  </div>
+
+  <script>
+    const messagesEl = document.getElementById("messages");
+    const inputEl    = document.getElementById("input");
+    const sendBtn    = document.getElementById("send-btn");
+
+    inputEl.addEventListener("input", () => {
+      inputEl.style.height = "auto";
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + "px";
+    });
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function makeAvatar(role) {
+      const el = document.createElement("div");
+      el.className = `avatar ${role}`;
+      el.textContent = role === "bot" ? "BC" : "You";
+      return el;
+    }
+
+    function addMessage(text, role) {
+      const row = document.createElement("div");
+      row.className = `message-row ${role}`;
+
+      const bubble = document.createElement("div");
+      bubble.className = `bubble ${role}`;
+      bubble.textContent = text;
+
+      if (role === "user") {
+        row.appendChild(bubble);
+        row.appendChild(makeAvatar(role));
+      } else {
+        row.appendChild(makeAvatar(role));
+        row.appendChild(bubble);
+      }
+
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function showTyping() {
+      const row = document.createElement("div");
+      row.className = "typing-row";
+      row.id = "typing-row";
+      row.appendChild(makeAvatar("bot"));
+      const bubble = document.createElement("div");
+      bubble.className = "typing-bubble";
+      bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+      row.appendChild(bubble);
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function removeTyping() {
+      const el = document.getElementById("typing-row");
+      if (el) el.remove();
+    }
+
+    async function ask(question) {
+      inputEl.value = question;
+      inputEl.dispatchEvent(new Event("input"));
+      await sendMessage();
+    }
+
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      inputEl.value = "";
+      inputEl.style.height = "auto";
+      sendBtn.disabled = true;
+
+      showTyping();
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text }),
+        });
+
+        removeTyping();
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        addMessage(data.reply, "bot");
+      } catch (err) {
+        removeTyping();
+        const row = document.createElement("div");
+        row.className = "message-row bot";
+        const av = makeAvatar("bot");
+        const bubble = document.createElement("div");
+        bubble.className = "bubble error";
+        bubble.textContent = `Something went wrong: ${err.message}`;
+        row.appendChild(av);
+        row.appendChild(bubble);
+        messagesEl.appendChild(row);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+  </script>
+</body>
+</html>
